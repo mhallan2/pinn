@@ -195,13 +195,13 @@ def g_func(x, y):
 PINN аппроксимирует решение $u(x, y)$ нейронной сетью $\hat{u}(x, y)$. Обучение сети происходит путем минимизации функции потерь, которая обычно имеет вид:
 
   $$
-  \mathcal{L}_{total} = \lambda_eq \mathcal{L}_{eq} + \lambda_bc \mathcal{L}_{bc}
+  \mathcal{L}_{total} = \lambda_{eq} \mathcal{L}_{eq} + \lambda_{bc} \mathcal{L}_{bc}
   $$
 
   где  
   * $\mathcal{L}_{eq}$ — ошибка на уравнении (PDE),  
   * $\mathcal{L}_{bc}$ — ошибка на границе,  
-  * $\lambda_eq$, $\lambda_bc$ - весовые коэффициенты для соответствующих потерь
+  * $\lambda_{eq}$, $\lambda_{bc}$ - весовые коэффициенты для соответствующих потерь
 
 
 ```python
@@ -933,4 +933,4 @@ if __name__ == "__main__":
 
 * Какое $\lambda_{bc}$ выбрать?
 
-Судя по результатам эксперимента и заданной конфигурации модели $\lambda_{bc}^{\rm opt} \in \left\{ \lambda \in \mathbb{R} \;\middle|\; 10^2 \leq \lambda \leq 10^3 \right\}$
+Судя по результатам эксперимента и заданной конфигурации модели $\lambda_{bc}^{\rm opt} \in \left\{ \lambda \in \mathbb{R} : 10^2 \leq \lambda \leq 10^3 \right\}$
