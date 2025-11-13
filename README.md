@@ -201,16 +201,14 @@ def g_func(x, y):
 
 PINN аппроксимирует решение $u(x, y)$ нейронной сетью $\hat{u}(x, y)$. Обучение сети происходит путем минимизации функции потерь, которая обычно имеет вид:
 
-$\mathcal{L} = \lambda_{eq}\mathcal{L}_{eq} + \lambda_{bc}\mathcal{L}_{bc}$,
+  $$
+  \mathcal{L}_{total} = \mathcal{L}_{eq} + \lambda_1 \mathcal{L}_{bc} + \lambda_2 \mathcal{L}_{ic}
+  $$
 
-где:
-* Потери на уравнении:
-  $$
-  \mathcal{L}_{eq} = \text{MSE}(\mathcal{N}[\hat u(x, y)])
-  $$
-* $\mathcal{L}_{bc}$ — потери на граничных условиях, обычно это $\mathcal{L}_{bc} = \text{MSE}(\mathcal{B}[\hat u(x, y)])$;
-* $\lambda_{bc}$ — весовой коэффициент для граничных условий;
-* $\lambda_{eq}$ — весовой коэффициент для физического уравнения.
+  где  
+  * `$\mathcal{L}_{eq}$` — ошибка на уравнении (PDE),  
+  * `$\mathcal{L}_{bc}$` — ошибка на границе,  
+  * `$\mathcal{L}_{ic}$` — ошибка начальных условий.
 
 
 ```python
