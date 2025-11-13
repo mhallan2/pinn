@@ -324,15 +324,14 @@ def set_seed(seed=69):
 
 Все необходимые в проекте метрики будет вычислять функция `compute_errors()`. Если флаг `return_fields` установлен на `True`, то возвращаться будут не только вычисленные ошибки, но и дополнительные поля, которые будут нужны для визуализации решения.
 
-*
-$
-\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left(u(x_i, y_i) - \hat{u}(x_i, y_i)\right)^2}
-$
+$$
+\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left( u(x_i, y_i) - \hat{u}(x_i, y_i) \right)^2 }}
+$$
 
-*
-$
-\text{Relative L2} = \frac{\| u(x_i, y_i) - \hat{u}(x_i, y_i) \|}{\| {u(x_i, y_i)} \|} = \frac{\sqrt{\sum_{i=1}^{N} \left(u(x_i, y_i) - \hat{u}(x_i, y_i)\right)^2}}{\sqrt{\sum_{i=1}^{N} \left(u(x_i, y_i)\right)^2}}
-$
+$$
+\text{Relative L2} = 
+\frac{\sqrt{\sum_{i=1}^{N} \left( u(x_i, y_i) - \hat{u}(x_i, y_i) \right)^2}}{\sqrt{\sum_{i=1}^{N} \left( u(x_i, y_i) \right)^2}}
+$$
 
 
 ```python
