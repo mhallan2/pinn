@@ -941,8 +941,3 @@ if __name__ == "__main__":
 * Какое $\lambda_{bc}$ выбрать?
 
 Судя по результатам эксперимента и заданной конфигурации модели $\lambda_{bc}^{opt} \in \{\lambda \in \mathbb{R} \mid 10^2 \leq \lambda \leq 10^3\}$
-
-
-```python
-
-```
