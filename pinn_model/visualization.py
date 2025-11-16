@@ -20,7 +20,6 @@ class Visualizer(ABC):
         path = self._get_unique_path(prefix)
         fig.savefig(path, dpi=300, bbox_inches="tight")
         print(f"Saved: {path}")
-        plt.show()
 
 
 class SolutionVisualizer(Visualizer):
@@ -42,6 +41,7 @@ class SolutionVisualizer(Visualizer):
         
         plt.tight_layout()
         self._save_plot(fig, "solution_2d")
+        plt.show()
 
     def plot_3d(self, X, Y, U_pred, U_true):
         """3D график решения и ошибки."""
@@ -61,6 +61,7 @@ class SolutionVisualizer(Visualizer):
         
         plt.tight_layout()
         self._save_plot(fig, "solution_3d")
+        plt.show()
 
 
 class LambdaVisualizer(Visualizer):
@@ -106,3 +107,4 @@ class LambdaVisualizer(Visualizer):
         
         plt.tight_layout()
         self._save_plot(fig, "lambda_results")
+        plt.show()
