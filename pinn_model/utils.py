@@ -32,9 +32,9 @@ def compute_errors(model, device, u_exact, Nx=100, Ny=100, return_fields=False):
         )
 
     error = U_pred - U_true
-    rmse = np.sqrt(np.mean(error**2))
+    mse = np.mean(error**2)
     rel_l2 = np.linalg.norm(error) / np.linalg.norm(U_true)
     if return_fields:
-        return rmse, rel_l2, X, Y, U_pred, U_true
+        return mse, rel_l2, X, Y, U_pred, U_true
     else:
-        return rmse, rel_l2
+        return mse, rel_l2

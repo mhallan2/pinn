@@ -1,9 +1,26 @@
+from abc import ABC, abstractmethod
 import torch
+from pde import f_func as f_rhs, g_func as g_bc
 
 
-class Losses:
+class Losses(ABC):
+    """Абстрактный базовый класс для уравнений в частных производных."""
+
     @staticmethod
-    def pde_loss(model, xy, f_func, as_tensor=False):
+    @abstractmethod
+    def f_func(x, y):
+        """Правая часть уравнения (функция f)."""
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def g_func(x, y):
+        """Граничное условие (функция g)."""
+        pass
+
+    @classmethod
+    def pde_loss(cls, model, xy, as_tensor=False):
+        """Вычисление невязки PDE."""
         xy.requires_grad_(True)
         u = model(xy)
         grads = torch.autograd.grad(
@@ -26,13 +43,25 @@ class Losses:
             retain_graph=True,
         )[0][:, 1:2]
 
-        residual = u_xx + u_yy - f_func(xy[:, 0:1], xy[:, 1:2])
-        rmse_pde = torch.mean(residual ** 2)
-        return residual if as_tensor else rmse_pde 
+        residual = u_xx + u_yy - cls.f_func(xy[:, 0:1], xy[:, 1:2])
+        mse_pde = torch.mean(residual ** 2)
+        return residual if as_tensor else mse_pde
+
+    @classmethod
+    def boundary_loss(cls, model, x_b, y_b, as_tensor=False):
+        """Вычисление невязки граничных условий."""
+        xy_b = torch.cat([x_b, y_b], dim=1)
+        residual = model(xy_b) - cls.g_func(x_b, y_b)
+        mse_boundary = torch.mean(residual ** 2)
+        return residual if as_tensor else mse_boundary
+
+class PoissonLosses(Losses):
+    """Потери на двумерноем уравнении Пуассона."""
 
     @staticmethod
-    def boundary_loss(model, x_b, y_b, g_func, as_tensor=False):
-        xy_b = torch.cat([x_b, y_b], dim=1)
-        residual = model(xy_b) - g_func(x_b, y_b)
-        rmse_boundary = torch.mean(residual ** 2)
-        return residual if as_tensor else rmse_boundary
+    def f_func(x, y):
+        return f_rhs(x, y)
+
+    @staticmethod
+    def g_func(x, y):
+        return g_bc(x, y)

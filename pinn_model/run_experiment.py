@@ -5,7 +5,7 @@ from training.trainer import Trainer
 from experiments.experiment import LambdaExperiment
 from visualization import LambdaVisualizer
 from utils import set_seed
-from pde import f_func, g_func
+from loss import PoissonLosses
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
 
     # Генератор данных и модель
     data_gen = DataGenerator()
-    model_cls = PINN
+    model = PINN(hidden_sizes=cfg.layers).to(cfg.device)
     
     # Список значений λ для эксперимента
     lambda_values = [1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]
@@ -29,9 +29,8 @@ def main():
         exp = LambdaExperiment(
             lam_bc=lam,
             cfg=cfg,
-            model_cls=model_cls,
-            f_func=f_func,
-            g_func=g_func,
+            model=model,
+            loss_class=PoissonLosses,
             data_gen=data_gen,
         )
         result = exp.run(Trainer)

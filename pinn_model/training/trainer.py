@@ -1,14 +1,12 @@
 import torch
 from training.history import TrainingHistory
-from loss import Losses
 
 
 class Trainer:
-    def __init__(self, model, config, f_func, g_func, data_gen):
+    def __init__(self, model, config, loss_class, data_gen):
         self.model = model
         self.cfg = config
-        self.f_func = f_func
-        self.g_func = g_func
+        self.losses = loss_class
         self.data_gen = data_gen
         self.history = TrainingHistory()
         self.device = config.device
@@ -27,8 +25,8 @@ class Trainer:
             x_f, y_f = self.data_gen.domain_points(self.cfg.N_f, device=self.device)
             xy_f = torch.cat([x_f, y_f], dim=1)
 
-            loss_pde = Losses.pde_loss(self.model, xy_f, self.f_func)
-            loss_bc = Losses.boundary_loss(self.model, x_b, y_b, self.g_func)
+            loss_pde = self.losses.pde_loss(self.model, xy_f)
+            loss_bc = self.losses.boundary_loss(self.model, x_b, y_b)
             loss = self.cfg.lam_pde * loss_pde + self.cfg.lam_bc * loss_bc
 
             loss.backward()

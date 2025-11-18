@@ -8,20 +8,19 @@ from experiments.result import LambdaRunResult
 class Experiment(ABC):
     """Абстрактный базовый класс для экспериментов с гиперпараметрами."""
     
-    def __init__(self, cfg, model_cls, f_func, g_func, data_gen):
+    def __init__(self, cfg, model, loss_class, data_gen):
         self.cfg = cfg
-        self.model = model_cls(hidden_sizes=cfg.layers).to(cfg.device)
-        self.f_func = f_func
-        self.g_func = g_func
+        self.model = model
+        self.loss_class = loss_class
         self.data_gen = data_gen
         self.history = None
-        self.rmse_per_epoch = []
+        self.mse_per_epoch = []
         self.rel_l2_per_epoch = []
 
     def epoch_callback(self, model, epoch):
         """Вызывается на каждой эпохе для сбора метрик."""
-        rmse, rel_l2 = compute_errors(model, self.cfg.device, u_exact)
-        self.rmse_per_epoch.append(rmse)
+        mse, rel_l2 = compute_errors(model, self.cfg.device, u_exact)
+        self.mse_per_epoch.append(mse)
         self.rel_l2_per_epoch.append(rel_l2)
 
     @abstractmethod
@@ -33,7 +32,7 @@ class Experiment(ABC):
         pass
 
     @abstractmethod
-    def create_result(self, history, rmse_final, rel_l2_final):
+    def create_result(self, history, mse_final, rel_l2_final):
         pass
 
     def run(self, trainer_cls):
@@ -45,19 +44,19 @@ class Experiment(ABC):
 
         # Запуск тренировки
         trainer = trainer_cls(
-            self.model, training_cfg, self.f_func, self.g_func, self.data_gen
+            self.model, training_cfg, self.loss_class, self.data_gen
         )
         trained_model, history = trainer.train(epoch_callback=self.epoch_callback)
         self.history = history
 
         # Конечные метрики
-        rmse_final, rel_l2_final = compute_errors(
+        mse_final, rel_l2_final = compute_errors(
             trained_model, training_cfg.device, u_exact
         )
 
-        print(f"{self.get_experiment_name()} | RMSE={rmse_final:.3e} | Rel L2={rel_l2_final:.3e}")
+        print(f"{self.get_experiment_name()} | MSE={mse_final:.3e} | Rel L2={rel_l2_final:.3e}")
 
-        return self.create_result(history, rmse_final, rel_l2_final)
+        return self.create_result(history, mse_final, rel_l2_final)
 
 class LambdaExperiment(Experiment):
     """
@@ -66,8 +65,8 @@ class LambdaExperiment(Experiment):
     на точность и эффективность решения.
     """
 
-    def __init__(self, lam_bc, cfg, model_cls, f_func, g_func, data_gen):
-        super().__init__(cfg, model_cls, f_func, g_func, data_gen)
+    def __init__(self, lam_bc, cfg, model, loss_class, data_gen):
+        super().__init__(cfg, model, loss_class, data_gen)
         self.lam_bc = lam_bc
 
     def get_experiment_name(self):
@@ -76,13 +75,13 @@ class LambdaExperiment(Experiment):
     def prepare_training_config(self):
         return replace(self.cfg, lam_bc=self.lam_bc)
 
-    def create_result(self, history, rmse_final, rel_l2_final):
+    def create_result(self, history, mse_final, rel_l2_final):
         """Создает объект результата"""
         return LambdaRunResult(
             lam_bc=self.lam_bc,
             history=history,
-            rmse_final=rmse_final,
+            mse_final=mse_final,
             rel_l2_final=rel_l2_final,
-            rmse_per_epoch=self.rmse_per_epoch,
+            mse_per_epoch=self.mse_per_epoch,
             rel_l2_per_epoch=self.rel_l2_per_epoch,
         )
