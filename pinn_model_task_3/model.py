@@ -1,6 +1,11 @@
 import torch.nn as nn
 import torch
 
+
+class Sin(nn.Module):
+    def forward(self, x):
+        return torch.sin(x)
+
 class PINN(nn.Module):
     def __init__(self, input_size=2, hidden_sizes=(64,64,64), output_size=1, activation=nn.Tanh()):
         super().__init__()

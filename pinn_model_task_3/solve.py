@@ -5,7 +5,7 @@ from data import DataGenerator
 from loss import HeatLosses
 from training.trainer import Trainer
 from visualization import SolutionVisualizer
-from utils import set_seed, compute_errors_time
+from utils import set_seed, compute_errors
 from pde import u_exact
 
 def main():
@@ -21,7 +21,7 @@ def main():
     trainer = Trainer(model, cfg, loss_class, data_gen)
     trained_model, history = trainer.train()
 
-    mse, rel_l2, X, Tt, U_pred, U_true = compute_errors_time(
+    mse, rel_l2, X, Tt, U_pred, U_true = compute_errors(
         trained_model, device, u_exact, L=cfg.L, T=cfg.T, return_fields=True
     )
 

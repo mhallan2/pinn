@@ -13,20 +13,20 @@ class Trainer:
     def train(self, epoch_callback=None):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.cfg.lr)
 
-        # Предсгенерированные точки для границ и начального условия
-        x_b, t_b = self.data_gen.boundary_points(self.cfg.N_b, self.cfg.L, self.cfg.T, self.device)
-        x_i, t_i = self.data_gen.initial_points(self.cfg.N_i, self.cfg.L, self.device)
+        # сгенерированные точки для границ и начального условия
+        x_b, t_b = self.data_gen.boundary_points(self.cfg.N_b, self.device)
+        x_i, t_i = self.data_gen.initial_points(self.cfg.N_i, self.device)
 
         self.model.train()
         for epoch in range(self.cfg.epochs + 1):
             optimizer.zero_grad()
 
             # Внутренние точки (domain)
-            x_f, t_f = self.data_gen.domain_points(self.cfg.N_f, self.cfg.L, self.cfg.T, self.device)
+            x_f, t_f = self.data_gen.domain_points(self.cfg.N_f, self.device)
             x_t = torch.cat([x_f, t_f], dim=1)
 
             # Вычисление потерь
-            loss_pde = self.losses.pde_loss(self.model, x_t, alpha=self.cfg.alpha)
+            loss_pde = self.losses.pde_loss(self.model, x_t)
             loss_bc = self.losses.boundary_loss(self.model, x_b, t_b)
             loss_ic = self.losses.initial_loss(self.model, x_i, t_i)
 

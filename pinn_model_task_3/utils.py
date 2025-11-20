@@ -12,13 +12,13 @@ def set_seed(seed=69):
     torch.backends.cudnn.benchmark = False
 
 
-def compute_errors_time(model, device, u_exact, L=1.0, T=1.0, Nx=100, Nt=100, return_fields=False):
+def compute_errors(model, device, u_exact, L=1.0, T=1.0, Nx=100, Nt=100, return_fields=False):
     x = np.linspace(0, L, Nx)
     t = np.linspace(0, T, Nt)
-    X, Tt = np.meshgrid(x, t)
+    X, T = np.meshgrid(x, t)
 
     x_t = torch.tensor(
-        np.stack([X.ravel(), Tt.ravel()], axis=1),
+        np.stack([X.ravel(), T.ravel()], axis=1),
         dtype=torch.float32
     ).to(device)
 
@@ -27,7 +27,7 @@ def compute_errors_time(model, device, u_exact, L=1.0, T=1.0, Nx=100, Nt=100, re
         U_pred = model(x_t).cpu().numpy().reshape(Nt, Nx)
         U_true = u_exact(
             torch.tensor(X, dtype=torch.float32),
-            torch.tensor(Tt, dtype=torch.float32)
+            torch.tensor(T, dtype=torch.float32)
         ).numpy()
 
     error = U_pred - U_true
@@ -35,5 +35,5 @@ def compute_errors_time(model, device, u_exact, L=1.0, T=1.0, Nx=100, Nt=100, re
     rel_l2 = np.linalg.norm(error) / np.linalg.norm(U_true)
 
     if return_fields:
-        return mse, rel_l2, X, Tt, U_pred, U_true
+        return mse, rel_l2, X, T, U_pred, U_true
     return mse, rel_l2

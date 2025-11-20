@@ -1,11 +1,15 @@
 import torch
+from config import Config
 
 
-def u_exact(x, t, L=1.0, alpha=1.0):
-    return torch.exp(-alpha * (torch.pi / L)**2 * t) * torch.sin(torch.pi * x / L)
+l = Config.L
+alpha = Config.alpha
 
-def f_func(x, y):
+def u_exact(x, t):
+    return torch.exp(-alpha * (torch.pi / l)**2 * t) * torch.sin(torch.pi * x / l)
+
+def g(x, y):
     return torch.zeros_like(x)
 
-def g_func(x, y):
-    return torch.zeros_like(x)
+def f(x):
+    return torch.sin(torch.pi * x / l)
