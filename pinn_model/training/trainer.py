@@ -12,21 +12,29 @@ class Trainer:
         self.device = config.device
 
     def train(self, epoch_callback=None):
+
         opt = torch.optim.Adam(self.model.parameters(), lr=self.cfg.lr)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             opt, factor=0.5, patience=500
         )
 
+        # boundary_points возвращает (x_b, y_b)
         x_b, y_b = self.data_gen.boundary_points(self.cfg.N_b, device=self.device)
+        xy_b = torch.cat([x_b, y_b], dim=1)  # сразу на всякий случай
+
         self.model.train()
 
         for epoch in range(self.cfg.epochs + 1):
+
             opt.zero_grad()
+
+            # Domain points возвращает отдельно x и y
             x_f, y_f = self.data_gen.domain_points(self.cfg.N_f, device=self.device)
             xy_f = torch.cat([x_f, y_f], dim=1)
 
             loss_pde = self.losses.pde_loss(self.model, xy_f)
-            loss_bc = self.losses.boundary_loss(self.model, x_b, y_b)
+            loss_bc  = self.losses.boundary_loss(self.model, x_b, y_b)
+
             loss = self.cfg.lam_pde * loss_pde + self.cfg.lam_bc * loss_bc
 
             loss.backward()
@@ -42,7 +50,8 @@ class Trainer:
 
             if epoch % self.cfg.verbose_every == 0:
                 print(
-                    f"[{epoch:5d}] Total={loss.item():.3e} PDE={loss_pde.item():.3e} BC={loss_bc.item():.3e}"
+                    f"[{epoch:5d}] Total={loss.item():.3e} "
+                    f"PDE={loss_pde.item():.3e} BC={loss_bc.item():.3e}"
                 )
 
         return self.model, self.history

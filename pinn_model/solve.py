@@ -1,7 +1,7 @@
 import torch
 from config import Config
 from model import PINN
-from pinn_model.loss import PoissonLosses
+from loss import PoissonLosses
 from training.trainer import Trainer
 from data import DataGenerator
 from visualization import SolutionVisualizer
